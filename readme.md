@@ -1,13 +1,13 @@
-# Methodology for China Provincial Simulated Hourly Electricity Load Profiles
+# Simulation of Hourly Electricity Load Profiles at the Provincial and Prefecture City Levels in China
 
 Power Transformation Lab, UCSD  
 Updated: May 2026
 
 ## Overview
 
-We developed a script to generate a **simulated hourly electricity load profile** (24 hours × days in month) for one or more Chinese provinces, given:
+We developed scripts to generate **simulated hourly electricity load profiles** (24 hours × days in month) for one or more Chinese provinces/prefecture cities, given:
 
-- a **target monthly total electricity consumption** (province-level, per month),  
+- a **target monthly total electricity consumption** (province-level or prefecture level, per month),  
 - a province’s typical **workday (工作日 / gongzuori) 24-hour shape**,  
 - **daily maximum / minimum** constraints derived from historical “全年日 / quannianri” data (scaled to the target year),  
 - and a small amount of **calendar handling** (month length \+ Lunar New Year shifting for Jan/Feb).
@@ -20,13 +20,14 @@ The core step is a **quadratic optimization (Gurobi)** that finds hourly loads t
 
 ## Repository / folder expectations
 
-The script reads a few CSVs from fixed relative paths:
+The scripts read a few CSVs from fixed relative paths:
 
 - data/  
     
   - prov\_vars.csv  
   - provincial\_monthly\_revised.csv  
   - holidays.csv
+  - 2022\_prefecture\_data.csv
 
 
 - daily\_profiles/  
@@ -256,3 +257,33 @@ For each province/month/year, the script writes: `Simulated_hourly_load_output/<
 5. Run:
 
     python simulate_province_load.py  
+
+
+
+# Prefecture Hourly Power Load Simulation Pipeline
+
+## Functions 
+
+### province_filter(province_list)
+Filters and maps Chinese province names to their English equivalents.
+- Input:
+   - `province_list` (list): A list of province names in Chinese.
+- Output:
+   - Dictionary mapping each province in `province_list` to its English name.
+- Example Usage:
+   - `province_filter(["河北省", "福建省"])`
+   - `Output: {'河北省': 'Hebei', '福建省': 'Fujian'}`
+
+#### prefecture_hourly(year, province_list=None, growth_rate=0.05)
+Generates hourly energy usage data for prefectures based on historical monthly data, considering growth rates for future years.
+- Inputs:
+   - `year` (int): The target year for which data is generated.
+   - `province_list` (list, optional): A list of province names in Chinese. If not provided, all provinces are processed.
+   - `growth_rate` (float, default=0.05): Annual growth rate for extrapolating future data.
+- Process:
+   - Reads base province level monthly data from data/2022_prefecture_data.csv.
+   - Simulates 2022 prefecture level hourly usage based on 2022 province level hourly load data and prefecture monthly usage shares.
+   - Adjusts 2022 prefecture level hourly load for future years after 2022 using a growth rate (default 0.05).
+   - Saves hourly data as CSV files for each prefecture.
+- Outputs:
+   - CSV files for prefecture level hourly data are saved in the Simulated_output_prefecture_hourly_load/ directory.
