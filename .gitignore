@@ -1,0 +1,11 @@
+# Ignore Mac system files
+.DS_Store
+
+# Ignore Python runtime caches (highly recommended for data/simulation projects)
+__pycache__/
+*.pyc
+
+# Ignore local virtual environments or logs
+.venv/
+venv/
+*.log
